@@ -20,6 +20,7 @@ from mmdet.utils.general_utils import mkdir
 from tools.condlanenet.post_process import CurvelanesPostProcessor
 from tools.condlanenet.lane_metric import LaneMetricCore
 from tools.condlanenet.common import convert_coords_formal, parse_anno, COLORS
+import torch.multiprocessing as mp
 
 
 def parse_args():
@@ -191,6 +192,11 @@ class DateEnconding(json.JSONEncoder):
 def main():
     args = parse_args()
 
+    try:
+        mp.set_start_method('spawn', force=True)
+    except RuntimeError:
+        pass
+
     cfg = mmcv.Config.fromfile(args.config)
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
@@ -208,7 +214,7 @@ def main():
     data_loader = build_dataloader(
         dataset,
         samples_per_gpu=1,
-        workers_per_gpu=cfg.data.workers_per_gpu,
+        workers_per_gpu=0, #cfg.data.workers_per_gpu,
         dist=distributed,
         shuffle=False)
 

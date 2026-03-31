@@ -25,6 +25,7 @@ class CulaneDataset(CustomDataset):
 
         # read image list
         self.img_infos, self.annotations = self.parser_datalist(data_list)
+        self.data_infos = self.img_infos
 
         # set group flag for the sampler
         if not self.test_mode:
@@ -113,3 +114,15 @@ class CulaneDataset(CustomDataset):
         id_classes = [1 for i in range(len(shapes))]
         id_instances = [i + 1 for i in range(len(shapes))]
         return shapes, id_classes, id_instances
+
+    def get_ann_info(self, idx):
+        shapes, id_classes, id_instances = self.load_labels(idx, 0, 0)
+        return {
+            'bboxes': np.zeros((len(shapes), 4), dtype=np.float32), 
+            'labels': np.array(id_classes, dtype=np.int64)
+        }
+    def evaluate(self, results, metric='mAP', logger=None, **kwargs):
+        """Dummy evaluate to avoid crash during training. 
+        Lane detection typically uses specialized evaluation scripts.
+        """
+        return {'mAP': 0.0}

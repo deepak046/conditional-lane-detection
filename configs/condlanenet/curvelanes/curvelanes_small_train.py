@@ -3,7 +3,7 @@
 """
 # global settings
 dataset_type = 'CurvelanesDataset'
-data_root = "/disk1/zhouyang/dataset/Curvelanes"
+data_root = "/home/deepak/Desktop/qtpie/lane_detection_classification/UFLDv2/dataset/sample_actual_curvelane/Curvelanes"
 test_mode = False
 mask_down_scale = 8
 hm_down_scale = 16
@@ -12,10 +12,10 @@ line_width = 3
 radius = 4
 lane_nms_thr = -1
 num_lane_classes = 1
-batch_size = 4
+batch_size = 2
 img_norm_cfg = dict(
     mean=[75.3, 76.6, 77.6], std=[50.5, 53.8, 54.3], to_rgb=False)
-img_scale = (800, 320)
+img_scale = (800, 416)
 train_cfg = dict(out_scale=mask_down_scale)
 test_cfg = dict(out_scale=mask_down_scale)
 
@@ -49,7 +49,7 @@ model = dict(
             strides = [1, 1],
             ratios=[4, 4],
             pos_shape=(batch_size, 10, 25),
-        ),
+            ),
         ),
     head=dict(
         type='CondLaneRNNHead',
@@ -169,14 +169,14 @@ val_pipeline = [
         meta_keys=[
             'filename', 'sub_img_name', 'gt_masks', 'mask_shape', 'hm_shape',
             'ori_shape', 'img_shape', 'down_scale', 'hm_down_scale',
-            'img_norm_cfg', 'gt_points', 'crop_shape', 'crop_offset'
+            'img_norm_cfg', 'gt_points'
         ]),
 ]
 
 data = dict(
     samples_per_gpu=
     batch_size,
-    workers_per_gpu=4,
+    workers_per_gpu=0,
     train=dict(
         type=dataset_type,
         data_root=data_root + '/train/',
@@ -221,7 +221,7 @@ log_config = dict(
     ])
 
 total_epochs = 14
-device_ids = "0,1"
+device_ids = "0"
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './work_dirs/exps/curvelanes/small'

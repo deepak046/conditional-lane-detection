@@ -8,6 +8,7 @@ import mmcv
 import torch
 from mmcv import Config, DictAction
 from mmcv.runner import init_dist
+import torch.multiprocessing as mp
 
 from mmdet import __version__
 from mmdet.apis import set_random_seed, train_detector
@@ -64,6 +65,11 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    try:
+        mp.set_start_method('spawn', force=True)
+    except RuntimeError:
+        pass
 
     cfg = Config.fromfile(args.config)
     if args.options is not None:

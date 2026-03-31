@@ -50,7 +50,12 @@ def single_gpu_test(model,
                     out_file=out_file,
                     score_thr=show_score_thr)
 
-        batch_size = data['img'][0].size(0)
+        if isinstance(data['img'], list):
+            batch_size = data['img'][0].size(0)
+        elif hasattr(data['img'], 'data') and isinstance(data['img'].data, list):
+            batch_size = data['img'].data[0].size(0)
+        else:
+            batch_size = data['img'].size(0)
         for _ in range(batch_size):
             prog_bar.update()
     return results

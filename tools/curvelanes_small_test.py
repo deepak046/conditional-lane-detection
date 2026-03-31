@@ -13,7 +13,7 @@ num_lane_classes = 1
 batch_size = 1
 img_norm_cfg = dict(
     mean=[75.3, 76.6, 77.6], std=[50.5, 53.8, 54.3], to_rgb=False)
-img_scale = (800, 320)
+img_scale = (800, 416)
 train_cfg = dict(out_scale=mask_down_scale)
 test_cfg = dict(out_scale=mask_down_scale)
 

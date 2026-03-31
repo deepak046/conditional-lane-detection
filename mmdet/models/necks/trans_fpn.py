@@ -105,7 +105,8 @@ class AttentionLayer(nn.Module):
         x = self.pre_conv(x)
         m_batchsize, _, height, width = x.size()
         if pos is not None:
-            x += pos
+            pos = pos[:m_batchsize]
+            x = x + pos
         proj_query = self.query_conv(x).view(m_batchsize, -1,
                                              width * height).permute(0, 2, 1)
         proj_key = self.key_conv(x).view(m_batchsize, -1, width * height)
@@ -273,7 +274,7 @@ class TransConvFPN(nn.Module):
         used_backbone_levels = len(laterals)
         for i in range(used_backbone_levels - 1, 0, -1):
             prev_shape = laterals[i - 1].shape[2:]
-            laterals[i - 1] += F.interpolate(
+            laterals[i - 1] = laterals[i - 1] + F.interpolate(
                 laterals[i], size=prev_shape, mode='nearest')
 
         # build outputs

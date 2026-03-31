@@ -104,7 +104,7 @@ class DynamicMaskHead(nn.Module):
         N, _, H, W = x.size()
         if not self.disable_coords:
             if self.compute_locations_pre and self.location_configs is not None:
-                locations = self.locations.to(x.device)
+                locations = self.locations.to(x.device)[:N]
             else:
                 locations = compute_locations(
                     x.size(2), x.size(3), stride=1, device='cpu')

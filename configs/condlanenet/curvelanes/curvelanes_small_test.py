@@ -1,9 +1,7 @@
-"""
-    config file of the small version of CondLaneNet for curvelanes
-"""
 # global settings
 dataset_type = 'CurvelanesDataset'
 data_root = "/disk1/zhouyang/dataset/Curvelanes"
+
 test_mode = False
 mask_down_scale = 8
 hm_down_scale = 16
@@ -15,7 +13,7 @@ num_lane_classes = 1
 batch_size = 1
 img_norm_cfg = dict(
     mean=[75.3, 76.6, 77.6], std=[50.5, 53.8, 54.3], to_rgb=False)
-img_scale = (800, 320)
+img_scale = (800, 416)
 train_cfg = dict(out_scale=mask_down_scale)
 test_cfg = dict(out_scale=mask_down_scale)
 
@@ -85,7 +83,6 @@ model = dict(
 
 train_compose = dict(bboxes=False, keypoints=True, masks=False)
 
-# data pipeline settings
 train_al_pipeline = [
     dict(type='Compose', params=train_compose),
     dict(type='Resize', height=img_scale[1], width=img_scale[0], p=1),
@@ -176,25 +173,25 @@ val_pipeline = [
 data = dict(
     samples_per_gpu=
     batch_size,
-    workers_per_gpu=4,
+    workers_per_gpu=0,
     train=dict(
         type=dataset_type,
         data_root=data_root + '/train/',
-        data_list=data_root + '/train/train.txt',
+        data_list=data_root + '/list/train.txt',
         pipeline=train_pipeline,
         test_mode=False,
     ),
     val=dict(
         type=dataset_type,
         data_root=data_root + '/valid/',
-        data_list=data_root + '/valid/valid.txt',
+        data_list=data_root + '/list/valid.txt',
         pipeline=val_pipeline,
         test_mode=False,
     ),
     test=dict(
         type=dataset_type,
         data_root=data_root + '/valid/',
-        data_list=data_root + '/valid/valid.txt',
+        data_list=data_root + '/list/valid.txt',
         test_suffix='.jpg',
         pipeline=val_pipeline,
         test_mode=True,
@@ -220,11 +217,12 @@ log_config = dict(
         dict(type='TextLoggerHook'),
     ])
 
-total_epochs = 14
+total_epochs = 5
 device_ids = "0,1"
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/exps/curvelanes/small'
+work_dir = './work_dirs/curvelanes/small'
 load_from = None
+# load_from = None
 resume_from = None
 workflow = [('train', 200), ('val', 1)]

@@ -35,9 +35,16 @@ class CurvelanesDataset(CulaneDataset):
             img[:352, :, :] = img_tmp[368:, ...]
             offset_x = 0
             offset_y = -368
+        elif ori_shape == (1080, 1920, 3):
+            img = np.zeros((640, 1920, 3), np.uint8)
+            img[:640, :, :] = img_tmp[440:, ...]
+            offset_x = 0
+            offset_y = -440
         else:
             return None
         img_shape = img.shape
+        crop_shape = img_shape
+        crop_offset = [abs(offset_x), abs(offset_y)]
         kps, id_classes, id_instances = self.load_labels(
             idx, offset_x, offset_y)
         results = dict(
@@ -48,7 +55,9 @@ class CurvelanesDataset(CulaneDataset):
             id_classes=id_classes,
             id_instances=id_instances,
             img_shape=img_shape,
-            ori_shape=ori_shape)
+            ori_shape=ori_shape,
+            crop_offset=crop_offset,
+            crop_shape=crop_shape)
 
         return self.pipeline(results)
 
@@ -73,7 +82,11 @@ class CurvelanesDataset(CulaneDataset):
             img[:352, :, :] = img_tmp[368:, ...]
             crop_shape = (352, 1280, 3)
             crop_offset = [0, 368]
-
+        elif ori_shape == (1080, 1920, 3):
+            img = np.zeros((640, 1920, 3), np.uint8)
+            img[:640, :, :] = img_tmp[440:, ...]
+            crop_shape = (640, 1920, 3)
+            crop_offset = [0, 440]
         else:
             return None
 

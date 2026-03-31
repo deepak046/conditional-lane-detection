@@ -193,7 +193,7 @@ class CurvelanesRnn(SingleStageDetector):
             output, memory = self.neck(output)
         if self.head:
             seeds, hm = self.bbox_head.forward_test(
-                output, kwargs['thr'], hack_seeds=hack_seeds, memory=memory)
+                output, kwargs.get('thr', 0.5), hack_seeds=hack_seeds, memory=memory)
         return [seeds, hm]
 
     def forward_dummy(self, img):
