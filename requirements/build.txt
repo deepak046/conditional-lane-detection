@@ -13,3 +13,4 @@ torchvision
 albumentations==0.4.6
 Shapely
 tqdm
+yapf==0.31.0

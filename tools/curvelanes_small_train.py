@@ -1,6 +1,6 @@
 # global settings
 dataset_type = 'CurvelanesDataset'
-data_root = "/disk1/zhouyang/dataset/Curvelanes"
+data_root = "/home/deepak/Desktop/qtpie/lane_detection_classification/autoware_vision_pilot/data/Curvelanes/"
 
 test_mode = False
 mask_down_scale = 8
