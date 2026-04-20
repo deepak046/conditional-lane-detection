@@ -129,7 +129,8 @@ def parse_requirements(fname='requirements.txt', with_version=True):
     import sys
     from os.path import exists
     import re
-    require_fpath = fname
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    require_fpath = os.path.join(base_dir, fname)
 
     def parse_line(line):
         """
@@ -138,6 +139,8 @@ def parse_requirements(fname='requirements.txt', with_version=True):
         if line.startswith('-r '):
             # Allow specifying requirements in other files
             target = line.split(' ')[1]
+            if not os.path.isabs(target):
+                target = os.path.join(base_dir, target)
             for info in parse_require_file(target):
                 yield info
         else:

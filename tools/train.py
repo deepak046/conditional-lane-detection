@@ -2,6 +2,7 @@ import argparse
 import copy
 import os
 import os.path as osp
+import sys
 import time
 
 import mmcv
@@ -9,6 +10,11 @@ import torch
 from mmcv import Config, DictAction
 from mmcv.runner import init_dist
 import torch.multiprocessing as mp
+
+# Ensure local package imports resolve when running as `python tools/train.py`.
+REPO_ROOT = osp.abspath(osp.join(osp.dirname(__file__), '..'))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
 from mmdet import __version__
 from mmdet.apis import set_random_seed, train_detector

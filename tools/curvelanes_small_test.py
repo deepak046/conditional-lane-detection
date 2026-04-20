@@ -1,6 +1,6 @@
 # global settings
 dataset_type = 'CurvelanesDataset'
-data_root = "/home/deepak/Desktop/qtpie/lane_detection_classification/autoware_vision_pilot/data/Curvelanes/"
+data_root = "/workspaces/condlanenet/data/Curvelanes_w_label/Curvelanes"
 
 test_mode = False
 mask_down_scale = 8
@@ -13,7 +13,7 @@ num_lane_classes = 1
 batch_size = 1
 img_norm_cfg = dict(
     mean=[75.3, 76.6, 77.6], std=[50.5, 53.8, 54.3], to_rgb=False)
-img_scale = (800, 416)
+img_scale = (800, 320)
 train_cfg = dict(out_scale=mask_down_scale)
 test_cfg = dict(out_scale=mask_down_scale)
 
@@ -177,21 +177,21 @@ data = dict(
     train=dict(
         type=dataset_type,
         data_root=data_root + '/train/',
-        data_list=data_root + '/list/train.txt',
+        data_list=data_root + '/train/train.txt',
         pipeline=train_pipeline,
         test_mode=False,
     ),
     val=dict(
         type=dataset_type,
         data_root=data_root + '/valid/',
-        data_list=data_root + '/list/valid.txt',
+        data_list=data_root + '/valid/valid.txt',
         pipeline=val_pipeline,
         test_mode=False,
     ),
     test=dict(
         type=dataset_type,
-        data_root=data_root + '/valid/',
-        data_list=data_root + '/list/valid.txt',
+        data_root=data_root + '/test/',
+        data_list=data_root + '/test/test.txt',
         test_suffix='.jpg',
         pipeline=val_pipeline,
         test_mode=True,

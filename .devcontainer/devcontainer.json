@@ -1,0 +1,35 @@
+{
+  "name": "condlanenet-ampere-fix",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspaces/condlanenet",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/condlanenet,type=bind,consistency=cached",
+  "mounts": [
+    "source=/home/deepak/Desktop/qtpie/lane_detection_classification/autoware_vision_pilot/data/sample,target=/workspaces/condlanenet/data/sample_data,type=bind,consistency=cached",
+    "source=/home/deepak/Desktop/qtpie/lane_detection_classification/autoware_vision_pilot/data/Curvelanes_w_label,target=/workspaces/condlanenet/data/Curvelanes_w_label,type=bind,consistency=cached"
+  ],
+  "runArgs": [
+    "--gpus", "all",
+    "--runtime=nvidia",
+    "--ipc=host"
+  ],
+  "containerEnv": {
+    "PYTHONUNBUFFERED": "1",
+    "FORCE_CUDA": "1",
+    "NVIDIA_VISIBLE_DEVICES": "all",
+    "NVIDIA_DRIVER_CAPABILITIES": "compute,utility"
+  },
+  "postCreateCommand": "pip install --no-cache-dir torch==1.8.1+cu111 torchvision==0.9.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html && bash .devcontainer/postCreate.sh",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  }
+}
