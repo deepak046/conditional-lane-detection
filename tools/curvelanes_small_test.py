@@ -1,6 +1,6 @@
 # global settings
 dataset_type = 'CurvelanesDataset'
-data_root = "/workspaces/condlanenet/data/Curvelanes_w_label/Curvelanes"
+data_root = "/workspaces/condlanenet/data/curvelane_complete_label_no_crop/Curvelanes"
 
 test_mode = False
 mask_down_scale = 8
@@ -221,7 +221,7 @@ total_epochs = 5
 device_ids = "0,1"
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/curvelanes/small'
+work_dir = './work_dirs/curvelanes_complete_label_no_crop/small'
 load_from = None
 # load_from = None
 resume_from = None

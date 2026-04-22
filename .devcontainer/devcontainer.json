@@ -1,13 +1,12 @@
 {
-  "name": "condlanenet-ampere-fix",
+  "name": "condlanenet-remote",
   "build": {
     "dockerfile": "Dockerfile"
   },
   "workspaceFolder": "/workspaces/condlanenet",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/condlanenet,type=bind,consistency=cached",
   "mounts": [
-    "source=/home/deepak/Desktop/qtpie/lane_detection_classification/autoware_vision_pilot/data/sample,target=/workspaces/condlanenet/data/sample_data,type=bind,consistency=cached",
-    "source=/home/deepak/Desktop/qtpie/lane_detection_classification/autoware_vision_pilot/data/Curvelanes_w_label,target=/workspaces/condlanenet/data/Curvelanes_w_label,type=bind,consistency=cached"
+    "source=/home/new_user/Desktop/shared-data/Line/Training/Train_Lane_Detection/Line_Annotations_New/curvelane_complete_label_no_crop,target=/workspaces/condlanenet/data/curvelane_complete_label_no_crop,type=bind,consistency=cached"
   ],
   "runArgs": [
     "--gpus", "all",

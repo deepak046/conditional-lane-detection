@@ -1,13 +1,20 @@
 import argparse
 import os
-
+import os.path as osp
+import sys
+import warnings
 import mmcv
 import torch
 from mmcv import Config, DictAction
 from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import get_dist_info, init_dist, load_checkpoint
-from tools.fuse_conv_bn import fuse_module
 
+# Ensure local package imports resolve when running as `python tools/train.py`.
+REPO_ROOT = osp.abspath(osp.join(osp.dirname(__file__), '..'))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
+from tools.fuse_conv_bn import fuse_module
 from mmdet.apis import multi_gpu_test, single_gpu_test
 from mmdet.core import wrap_fp16_model
 from mmdet.datasets import build_dataloader, build_dataset
@@ -93,8 +100,17 @@ def main():
     if args.launcher == 'none':
         distributed = False
     else:
-        distributed = True
-        init_dist(args.launcher, **cfg.dist_params)
+        has_dist_env = 'RANK' in os.environ and 'WORLD_SIZE' in os.environ
+        if args.launcher == 'pytorch' and not has_dist_env:
+            warnings.warn(
+                '`--launcher pytorch` was requested but distributed env vars '
+                '(RANK/WORLD_SIZE) are missing. Falling back to '
+                '`--launcher none` for single-process evaluation. '
+                'Use `torchrun` for distributed testing.')
+            distributed = False
+        else:
+            distributed = True
+            init_dist(args.launcher, **cfg.dist_params)
 
     # build the dataloader
     # TODO: support multiple images per gpu (only minor changes are needed)
@@ -108,6 +124,7 @@ def main():
 
     # build the model and load checkpoint
     model = build_detector(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
+    model.cfg = cfg
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
         wrap_fp16_model(model)

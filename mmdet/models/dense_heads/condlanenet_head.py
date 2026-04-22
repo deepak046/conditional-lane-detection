@@ -754,7 +754,8 @@ class CondLaneRNNHead(nn.Module):
                 pos = label * h * w + r * w + c
                 poses.append(pos)
             poses = torch.from_numpy(np.array(
-                poses, np.long)).long().to(device).unsqueeze(1)
+                poses, np.int64)).long().to(device).unsqueeze(1)
+           
             return poses
 
         x_list = list(inputs)

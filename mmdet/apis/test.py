@@ -9,6 +9,27 @@ import torch.distributed as dist
 from mmcv.runner import get_dist_info
 
 from mmdet.core import tensor2imgs
+from .inference import _draw_lane_result, _is_lane_result, _to_cpu_result
+
+
+def _unwrap_data_container(data):
+    """Return payload for mmcv DataContainer-like objects."""
+    if hasattr(data, 'data'):
+        return data.data
+    if hasattr(data, '_data'):
+        return data._data
+    return data
+
+
+def _build_out_file(out_dir, img_meta):
+    """Build a stable visualization output path under out_dir."""
+    rel_name = img_meta.get('sub_img_name') or osp.basename(
+        img_meta.get('filename', 'result.jpg'))
+    # Ensure extension exists for image codecs.
+    if osp.splitext(rel_name)[1] == '':
+        rel_name = f'{rel_name}.jpg'
+    rel_name = rel_name.lstrip('/\\')
+    return osp.join(out_dir, rel_name)
 
 
 def single_gpu_test(model,
@@ -26,8 +47,16 @@ def single_gpu_test(model,
         results.append(result)
 
         if show or out_dir:
-            img_tensor = data['img'][0]
-            img_metas = data['img_metas'][0].data[0]
+            img_payload = _unwrap_data_container(data['img'])
+            meta_payload = _unwrap_data_container(data['img_metas'])
+            if isinstance(img_payload, list):
+                img_tensor = img_payload[0]
+            else:
+                img_tensor = img_payload
+            if isinstance(meta_payload, list):
+                img_metas = meta_payload[0]
+            else:
+                img_metas = meta_payload
             imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])
             assert len(imgs) == len(img_metas)
 
@@ -39,23 +68,35 @@ def single_gpu_test(model,
                 img_show = mmcv.imresize(img_show, (ori_w, ori_h))
 
                 if out_dir:
-                    out_file = osp.join(out_dir, img_meta['filename'])
+                    out_file = _build_out_file(out_dir, img_meta)
                 else:
                     out_file = None
 
-                model.module.show_result(
-                    img_show,
-                    result,
-                    show=show,
-                    out_file=out_file,
-                    score_thr=show_score_thr)
+                if _is_lane_result(result):
+                    vis_canvas = img_meta.get('filename', img_show)
+                    vis_img = _draw_lane_result(model.module, vis_canvas, result,
+                                                score_thr=show_score_thr,
+                                                rescale_points=False,
+                                                img_meta=img_meta)
+                    if out_file is not None:
+                        mmcv.mkdir_or_exist(osp.dirname(out_file))
+                        mmcv.imwrite(vis_img, out_file)
+                    if show:
+                        mmcv.imshow(vis_img, win_name='result', wait_time=0)
+                else:
+                    vis_result = _to_cpu_result(result)
+                    model.module.show_result(
+                        img_show,
+                        vis_result,
+                        show=show,
+                        out_file=out_file,
+                        score_thr=show_score_thr)
 
-        if isinstance(data['img'], list):
-            batch_size = data['img'][0].size(0)
-        elif hasattr(data['img'], 'data') and isinstance(data['img'].data, list):
-            batch_size = data['img'].data[0].size(0)
+        img_payload = _unwrap_data_container(data['img'])
+        if isinstance(img_payload, list):
+            batch_size = img_payload[0].size(0)
         else:
-            batch_size = data['img'].size(0)
+            batch_size = img_payload.size(0)
         for _ in range(batch_size):
             prog_bar.update()
     return results

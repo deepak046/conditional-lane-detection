@@ -3,7 +3,7 @@
 """
 # global settings
 dataset_type = 'CurvelanesDataset'
-data_root = "/workspaces/condlanenet/data/Curvelanes_w_label/Curvelanes"
+data_root = "/workspaces/condlanenet/data/curvelane_complete_label_no_crop/Curvelanes"
 test_mode = False
 mask_down_scale = 8
 hm_down_scale = 16
@@ -220,11 +220,11 @@ log_config = dict(
         dict(type='TextLoggerHook'),
     ])
 
-total_epochs = 14
+total_epochs = 50
 device_ids = "0"
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/exps/curvelanes/small'
+work_dir = './work_dirs/exps/curvelanes_complete_label_no_crop/small_50ep'
 load_from = None
 resume_from = None
 workflow = [('train', 200), ('val', 1)]
